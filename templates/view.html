@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Attendance</title>
+</head>
+<body>
+    <h2>Today's Attendance</h2>
+
+    {% if records %}
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Roll</th>
+                <th>Name</th>
+                <th>Day</th>
+                <th>Time</th>
+            </tr>
+
+            {% for r in records %}
+            <tr>
+                <td>{{ r[0] }}</td>
+                <td>{{ r[1] }}</td>
+                <td>{{ r[2] }}</td>
+                <td>{{ r[3] }}</td>
+                <td>{{ r[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No attendance marked today.</p>
+    {% endif %}
+
+    <br>
+
+    <a href="{{ url_for('register_student') }}">Register Student</a> |
+    <a href="{{ url_for('clear_attendance') }}">Clear Attendance</a> |
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
