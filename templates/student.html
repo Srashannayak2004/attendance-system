@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Attendance</title>
+</head>
+<body>
+    <h2>Mark Attendance</h2>
+
+    <form method="POST">
+        Roll: <input type="text" name="roll" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <p>{{ msg }}</p>
+
+    <br>
+    <a href="{{ url_for('login') }}">Teacher Login</a>
+</body>
+</html>
