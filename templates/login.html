@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Login</title>
+</head>
+<body>
+    <h2>Teacher Login</h2>
+
+    <form method="POST">
+        Username: <input type="text" name="attendance" required><br><br>
+        Password: <input type="password" name="password123" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p>{{ msg }}</p>
+
+    <br>
+    <a href="{{ url_for('student_page') }}">Back to Student Page</a>
+</body>
+</html>
