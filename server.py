@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime, date
 
 app = Flask(__name__)
-app.secret_key = "mysecretkey"
+app.secret_key = "myattendanceapp2025"  # <-- proper secret key
 
 DB_NAME = "attendance.db"
 
@@ -43,15 +43,15 @@ init_db()
 
 # ----------------- Routes -----------------
 
+# Student page
 @app.route("/", methods=["GET","POST"])
 def student_page():
     msg = ""
     if request.method == "POST":
-        roll = request.form["roll"].strip()
+        roll = request.form.get("roll", "").strip()
 
         conn = get_conn()
         c = conn.cursor()
-
         c.execute("SELECT name FROM students WHERE roll=?", (roll,))
         student = c.fetchone()
 
@@ -74,20 +74,18 @@ def student_page():
 
     return render_template("student.html", msg=msg)
 
-# ----------------- Teacher Login -----------------
+# Teacher login
 @app.route("/login", methods=["GET","POST"])
 def login():
     msg = ""
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
         if username == "teacher" and password == "password123":
             session["teacher"] = True
             return redirect(url_for("view_attendance"))
         else:
             msg = "Invalid credentials"
-
     return render_template("login.html", msg=msg)
 
 @app.route("/logout")
@@ -95,32 +93,27 @@ def logout():
     session.pop("teacher", None)
     return redirect(url_for("login"))
 
-# Helper to protect teacher pages
 def require_teacher():
     return "teacher" in session
 
-# ----------------- View Attendance -----------------
+# View Attendance
 @app.route("/view")
 def view_attendance():
     if not require_teacher():
         return redirect(url_for("login"))
 
     today = date.today().strftime("%Y-%m-%d")
-
     conn = get_conn()
     c = conn.cursor()
-
     try:
         c.execute("SELECT id, roll, name, day, time FROM attendance WHERE day=? ORDER BY time DESC", (today,))
         records = c.fetchall()
     except sqlite3.OperationalError:
         records = []
-
     conn.close()
-
     return render_template("view.html", records=records)
 
-# ----------------- Clear Attendance -----------------
+# Clear Attendance
 @app.route("/clear")
 def clear_attendance():
     if not require_teacher():
@@ -128,14 +121,12 @@ def clear_attendance():
 
     conn = get_conn()
     c = conn.cursor()
-
     c.execute("DELETE FROM attendance")
     conn.commit()
     conn.close()
-
     return redirect(url_for("view_attendance"))
 
-# ----------------- Register Student -----------------
+# Register Student
 @app.route("/register", methods=["GET","POST"])
 def register_student():
     if not require_teacher():
@@ -143,21 +134,18 @@ def register_student():
 
     msg = ""
     if request.method == "POST":
-        roll = request.form["roll"].strip()
-        name = request.form["name"].strip()
+        roll = request.form.get("roll", "").strip()
+        name = request.form.get("name", "").strip()
 
         conn = get_conn()
         c = conn.cursor()
-
         try:
             c.execute("INSERT INTO students (roll,name) VALUES (?,?)", (roll,name))
             conn.commit()
             msg = f"Student {name} ({roll}) registered successfully!"
         except sqlite3.IntegrityError:
             msg = "Roll already exists!"
-
         conn.close()
-
     return render_template("register.html", msg=msg)
 
 # ----------------- Run Server -----------------
